@@ -8,6 +8,7 @@ import firebase, {
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { baseURL } from "../../../../config/url_enum";
+import { authenticateJWT } from "../../../../utils";
 
 const Login = () => {
   const router = useRouter();
@@ -28,7 +29,7 @@ const Login = () => {
         .then((response) => response.json())
         .then((response) => {
           if (response?.data?.token) {
-            // localStorage.setItem("token", response.data.token);
+            authenticateJWT(response.data.token);
             router.push("/page/account/wishlist");
           }
         });
