@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import CommonLayout from "../../../components/shop/common-layout";
 import { Input, Container, Row, Form, Label, Col } from "reactstrap";
 import { baseURL } from "../../../config/url_enum";
+import { useRouter } from "next/router";
 
 const Register = () => {
+  const router = useRouter();
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -27,13 +29,16 @@ const Register = () => {
           password: user?.password,
         }),
       };
-      fetch(`${baseURL}/user/register`, requestOptions).then((response) =>
-        response.json()
-      );
+      fetch(`${baseURL}/user/register`, requestOptions)
+        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 200) {
+            router.push("/page/account/wishlist");
+          }
+        });
     } catch (err) {
       console.log(err);
     }
-    alert("You have registered your account");
   };
 
   return (
