@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CommonLayout from "../../../../components/shop/common-layout";
-import { Container, Row, Form, Label, Input, Col } from "reactstrap";
+import { Container, Row, Label, Input, Col } from "reactstrap";
 import firebase, {
   googleProvider,
   facebookProvider,
@@ -9,13 +9,15 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { baseURL } from "../../../../config/url_enum";
 import { authenticateJWT } from "../../../../utils";
+import { Formik, Form, Field } from "formik";
+import Swal from "sweetalert2";
+import * as Yup from "yup";
 
 const Login = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const loginHandler = () => {
+  const [loginError, setLoginError] = useState("");
+  const loginHandler = (values) => {
+    const { email, password } = values;
     try {
       const requestOptions = {
         method: "POST",
@@ -30,13 +32,27 @@ const Login = () => {
         .then((response) => {
           if (response?.data?.token) {
             authenticateJWT(response.data.token);
-            router.push("/page/account/wishlist");
+            Swal.fire({
+              title: "Yahoo!",
+              text: "Sucessfully authenticated",
+              icon: "success",
+              showDenyButton: false,
+            }),
+              router.push("/page/account/wishlist");
+          } else if (response?.message) {
+            setLoginError(response.message);
+            Swal.fire({
+              title: "Error!",
+              text: "Facing Issue on Account",
+              icon: "error",
+              showDenyButton: false,
+            }),
+              console.log(response.message);
           }
         });
     } catch (err) {
       console.log(err);
     }
-    alert("You have Login your account");
   };
 
   const googleAuth = async () => {
@@ -78,6 +94,12 @@ const Login = () => {
       }, 200);
     }
   };
+  const routerHandler = () => {
+    router.push(`/page/account/register`);
+  };
+  const validationSchema = Yup.object({
+    email: Yup.string().email("Invalid email format").required("Required"),
+  });
 
   return (
     <CommonLayout parent="home" title="login">
@@ -87,49 +109,65 @@ const Login = () => {
             <Col lg="6">
               <h3>Login</h3>
               <div className="theme-card">
-                <Form className="theme-form">
-                  <div className="form-group">
-                    <Label for="email">Email</Label>
-                    <Input
-                      type="text"
-                      defaultValue={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="form-control"
-                      placeholder="Email"
-                      required=""
-                    />
-                  </div>
-                  <div className="form-group">
-                    <Label for="review">Password</Label>
-                    <Input
-                      type="password"
-                      defaultValue={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="form-control"
-                      id="review"
-                      placeholder="Enter your password"
-                      required=""
-                    />
-                  </div>
-                  <a href="#" className="btn btn-solid" onClick={loginHandler}>
-                    Login
-                  </a>
-                  <div className="footer-social">
-                    <ul>
-                      <li onClick={facebookAuth}>
-                        <i className="fa fa-facebook" aria-hidden="true"></i>
-                      </li>
-                      <li onClick={googleAuth}>
-                        <a>
-                          <i
-                            className="fa fa-google-plus"
-                            aria-hidden="true"
-                          ></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </Form>
+                <Formik
+                  initialValues={{
+                    email: "",
+                    password: "",
+                  }}
+                  validationSchema={validationSchema}
+                  onSubmit={(values) => {
+                    loginHandler(values);
+                  }}
+                >
+                  {({ errors, touched }) => (
+                    <Form className="theme-form">
+                      <div className="form-group">
+                        <Label for="email">Email</Label>
+                        <Field
+                          name="email"
+                          type="email"
+                          className="form-control"
+                        />
+
+                        {errors.email && touched.email ? (
+                          <div style={{ color: "red" }}>{errors.email}</div>
+                        ) : null}
+                      </div>
+                      <div className="form-group">
+                        <Label for="review">Password</Label>
+                        <Field
+                          name="password"
+                          type="password"
+                          className="form-control"
+                        />
+                        {loginError && (
+                          <div style={{ color: "red" }}>{loginError}</div>
+                        )}
+                      </div>
+                      <button className="btn btn-solid" type="submit">
+                        Login
+                      </button>
+                      <div className="footer-social">
+                        <ul>
+                          <li onClick={facebookAuth}>
+                            <i
+                              className="fa fa-facebook"
+                              aria-hidden="true"
+                            ></i>
+                          </li>
+                          <li onClick={googleAuth}>
+                            <a>
+                              <i
+                                className="fa fa-google-plus"
+                                aria-hidden="true"
+                              ></i>
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
               </div>
             </Col>
             <Col lg="6" className="right-login">
@@ -141,9 +179,9 @@ const Login = () => {
                   and easy. It allows you to be able to order from our shop. To
                   start shopping click register.
                 </p>
-                <a href="#" className="btn btn-solid">
+                <button className="btn btn-solid" onClick={routerHandler}>
                   Create an Account
-                </a>
+                </button>
               </div>
             </Col>
           </Row>
