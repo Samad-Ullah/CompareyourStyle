@@ -1,45 +1,66 @@
 import React, { useState } from "react";
 import CommonLayout from "../../../components/shop/common-layout";
-import { Input, Container, Row, Form, Label, Col } from "reactstrap";
+import { Input, Container, Row, Label, Col } from "reactstrap";
 import { baseURL } from "../../../config/url_enum";
+import Swal from "sweetalert2";
 import { useRouter } from "next/router";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 
 const Register = () => {
   const router = useRouter();
-  const [user, setUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  const [loginError, setLoginError] = useState("");
 
-  const handleChange = (e) => {
-    setUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleRegister = () => {
+  const handleRegister = (values) => {
+    const { firstName, lastName, email, password } = values;
     try {
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: user?.firstName,
-          lastName: user?.lastName,
-          email: user?.email,
-          password: user?.password,
+          firstName,
+          lastName,
+          email,
+          password,
         }),
       };
       fetch(`${baseURL}/user/register`, requestOptions)
         .then((response) => response.json())
         .then((response) => {
-          if (response.status === 200) {
+          if (response?.status === 200) {
             router.push("/page/account/wishlist");
+          } else if (response?.message) {
+            return (
+              Swal.fire({
+                title: "Error!",
+                text: "Email Already Exists",
+                icon: "error",
+                showDenyButton: false,
+              }),
+              setLoginError(response.message)
+            );
           }
         });
     } catch (err) {
       console.log(err);
     }
   };
+
+  const validationSchema = Yup.object({
+    firstName: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+    lastName: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+    email: Yup.string().email("Invalid email format").required("Required"),
+    password: Yup.string()
+      .required("No password provided.")
+      .min(8, "Password is too short - should be 8 chars minimum.")
+      .matches(/[a-zA-Z]/, "Password can only contain Latin letters."),
+  });
 
   return (
     <CommonLayout parent="home" title="register">
@@ -49,67 +70,89 @@ const Register = () => {
             <Col lg="12">
               <h3>create account</h3>
               <div className="theme-card">
-                <Form className="theme-form">
-                  <Row>
-                    <Col md="6">
-                      <Label for="email">First Name</Label>
-                      <Input
-                        type="text"
-                        name="firstName"
-                        onChange={handleChange}
-                        className="form-control"
-                        id="fname"
-                        placeholder="First Name"
-                        required=""
-                      />
-                    </Col>
-                    <Col md="6">
-                      <Label for="review">Last Name</Label>
-                      <Input
-                        type="text"
-                        name="lastName"
-                        onChange={handleChange}
-                        className="form-control"
-                        id="lname"
-                        placeholder="Last Name"
-                        required=""
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="6">
-                      <Label for="email">email</Label>
-                      <Input
-                        type="text"
-                        name="email"
-                        onChange={handleChange}
-                        className="form-control"
-                        id="email"
-                        placeholder="Email"
-                        required=""
-                      />
-                    </Col>
-                    <Col md="6">
-                      <Label for="review">Password</Label>
-                      <Input
-                        type="password"
-                        name="password"
-                        onChange={handleChange}
-                        className="form-control"
-                        id="review"
-                        placeholder="Enter your password"
-                        required=""
-                      />
-                    </Col>
-                    <a
-                      href="#"
-                      className="btn btn-solid"
-                      onClick={handleRegister}
-                    >
-                      create Account
-                    </a>
-                  </Row>
-                </Form>
+                <Formik
+                  initialValues={{
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    password: "",
+                  }}
+                  validationSchema={validationSchema}
+                  onSubmit={(values) => {
+                    handleRegister(values);
+                  }}
+                >
+                  {({ errors, touched }) => (
+                    <Form className="theme-form">
+                      <Row>
+                        <Col md="6">
+                          <Label for="email">First Name</Label>
+                          <Field
+                            name="firstName"
+                            type="text"
+                            className="form-control"
+                          />
+                          {errors.firstName && touched.firstName ? (
+                            <div
+                              style={{
+                                color: "red",
+                                marginTop: "-13px",
+                              }}
+                            >
+                              {errors.firstName}
+                            </div>
+                          ) : null}
+                        </Col>
+                        <Col md="6">
+                          <Label for="review">Last Name</Label>
+                          <Field
+                            name="lastName"
+                            type="text"
+                            className="form-control"
+                          />
+                          {errors.lastName && touched.lastName ? (
+                            <div style={{ color: "red", marginTop: "-13px" }}>
+                              {errors.lastName}
+                            </div>
+                          ) : null}
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="6">
+                          <Label for="email">email</Label>
+                          <Field
+                            name="email"
+                            type="email"
+                            className="form-control"
+                          />
+
+                          {loginError && (
+                            <div style={{ color: "red", marginBottom: "10px" }}>
+                              {loginError}
+                            </div>
+                          )}
+                        </Col>
+                        <Col md="6">
+                          <Label for="review">Password</Label>
+                          <Field
+                            name="password"
+                            type="password"
+                            className="form-control"
+                          />
+
+                          {errors.password && touched.password ? (
+                            <div style={{ color: "red", marginBottom: "10px" }}>
+                              {errors.password}
+                            </div>
+                          ) : null}
+                        </Col>
+                        <button className="btn btn-solid" type="submit">
+                          create Account
+                        </button>
+                      </Row>
+                    </Form>
+                  )}
+                </Formik>
               </div>
             </Col>
           </Row>
