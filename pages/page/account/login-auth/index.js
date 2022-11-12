@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 import * as Yup from "yup";
 import PostLoader from "../../../../components/common/PostLoader";
 import Image from "next/image";
+import loader from "../../../../public/assets/loader/Loader.gif";
 
 const Login = () => {
   const router = useRouter();
@@ -72,12 +73,7 @@ const Login = () => {
           backgroundColor: "transparent",
         }}
       >
-        <Image
-          src="/assets/loader/Load.svg"
-          width="100px"
-          height="100px"
-          alt="loader"
-        />
+        <Image src={loader} width="100px" height="100px" alt="loader" />
       </div>
     );
   }
