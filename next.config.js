@@ -25,7 +25,6 @@
 
 // module.exports = {swcMinify: true}, withPlugins([withImages], nextConfig);
 
-
 const nextConfig = {
   env: {
     API_URL: "http://localhost:8000/graphql",
