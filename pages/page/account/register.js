@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
+import loader from "../../../public/assets/loader/Loader.gif";
 
 const Register = () => {
   const router = useRouter();
@@ -78,12 +79,7 @@ const Register = () => {
           opacity: "0.5px",
         }}
       >
-        <Image
-          src="/assets/loader/Load.svg"
-          width="100px"
-          height="100px"
-          alt="loader"
-        />
+        <Image src={loader} width="100px" height="100px" alt="loader" />
       </div>
     );
   }
