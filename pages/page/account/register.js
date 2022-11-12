@@ -6,9 +6,11 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import Image from "next/image";
 
 const Register = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
   const handleRegister = (values) => {
@@ -24,10 +26,12 @@ const Register = () => {
           password,
         }),
       };
+      setLoading(true);
       fetch(`${baseURL}/user/register`, requestOptions)
         .then((response) => response.json())
         .then((response) => {
           if (response?.status === 200) {
+            setLoading(false);
             router.push("/page/account/wishlist");
           } else if (response?.message) {
             return (
@@ -61,6 +65,28 @@ const Register = () => {
       .min(8, "Password is too short - should be 8 chars minimum.")
       .matches(/[a-zA-Z]/, "Password can only contain Latin letters."),
   });
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "red",
+          opacity: "0.5px",
+        }}
+      >
+        <Image
+          src="/assets/loader/Loader.gif"
+          width="100px"
+          height="100px"
+          alt="loader"
+        />
+      </div>
+    );
+  }
 
   return (
     <CommonLayout parent="home" title="register">

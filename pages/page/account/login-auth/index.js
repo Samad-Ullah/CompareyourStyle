@@ -12,10 +12,14 @@ import { authenticateJWT } from "../../../../utils";
 import { Formik, Form, Field } from "formik";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
+import PostLoader from "../../../../components/common/PostLoader";
+import Image from "next/image";
 
 const Login = () => {
   const router = useRouter();
   const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const loginHandler = (values) => {
     const { email, password } = values;
     try {
@@ -27,11 +31,13 @@ const Login = () => {
           password: password,
         }),
       };
+      setLoading(true);
       fetch(`${baseURL}/user/login`, requestOptions)
         .then((response) => response.json())
         .then((response) => {
           if (response?.data?.token) {
             authenticateJWT(response.data.token);
+            setLoading(false);
             Swal.fire({
               title: "Yahoo!",
               text: "Sucessfully authenticated",
@@ -54,6 +60,27 @@ const Login = () => {
       console.log(err);
     }
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "transparent",
+        }}
+      >
+        <Image
+          src="/assets/loader/Loader.gif"
+          width="100px"
+          height="100px"
+          alt="loader"
+        />
+      </div>
+    );
+  }
 
   const googleAuth = async () => {
     try {
