@@ -73,7 +73,7 @@ const Login = () => {
         }}
       >
         <Image
-          src="/assets/loader/Loader.gif"
+          src="/assets/loader/Load.svg"
           width="100px"
           height="100px"
           alt="loader"
