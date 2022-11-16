@@ -50,11 +50,12 @@ const Login = () => {
             setLoginError(response.message);
             Swal.fire({
               title: "Error!",
-              text: "Facing Issue on Account",
+              text: response.message,
               icon: "error",
               showDenyButton: false,
             }),
-              console.log(response.message);
+              setLoading(false);
+            // router.push("/page/account/login-auth");
           }
         });
     } catch (err) {

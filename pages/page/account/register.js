@@ -8,6 +8,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
 import loader from "../../../public/assets/loader/Loader.gif";
+import { authenticateJWT } from "../../../utils";
 
 const Register = () => {
   const router = useRouter();
@@ -33,7 +34,13 @@ const Register = () => {
         .then((response) => {
           if (response?.status === 200) {
             setLoading(false);
-            router.push("/page/account/wishlist");
+            router.push("/page/account/login-auth");
+            Swal.fire({
+              title: "Yahoo!",
+              text: "Sucessfully Registered . kindly Login",
+              icon: "success",
+              showDenyButton: false,
+            });
           } else if (response?.message) {
             return (
               Swal.fire({
@@ -75,7 +82,7 @@ const Register = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "red",
+          // backgroundColor: "red",
           opacity: "0.5px",
         }}
       >

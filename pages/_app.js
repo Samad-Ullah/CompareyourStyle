@@ -3,6 +3,7 @@ import ThemeSettings from "../components/customizer/theme-settings";
 import "../public/assets/scss/app.scss";
 import { ToastContainer } from "react-toastify";
 import TapTop from "../components/common/widgets/Tap-Top";
+import { SessionProvider } from "next-auth/react";
 import MessengerCustomerChat from "react-messenger-customer-chat";
 import CartContextProvider from "../helpers/cart/CartContext";
 import { WishlistContextProvider } from "../helpers/wishlist/WishlistContext";
