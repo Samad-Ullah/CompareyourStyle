@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useQuery } from "@apollo/client";
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 import { Media } from "reactstrap";
 import language from "../../constant/langConfig.json";
 import i18next from "../../constant/i18n";
@@ -18,7 +18,7 @@ const GET_CURRENCY = gql`
 `;
 
 const Currency = ({ icon }) => {
-  var { data } = useQuery(GET_CURRENCY);
+  // var { data } = useQuery(GET_CURRENCY);
   const Context = useContext(CurrencyContext);
   const selectedCurrency = Context.currencyContext.selectedCurrency;
 
@@ -50,14 +50,14 @@ const Currency = ({ icon }) => {
         </ul>
         <h6>currency</h6>
         <ul className="list-inline">
-          {data &&
+          {/* {data &&
             data.getCurrency.map((cur, i) => (
               <li key={i}>
                 <div onClick={() => selectedCurrency(cur)}>
                   {cur.symbol} {cur.currency}
                 </div>
               </li>
-            ))}
+            ))} */}
         </ul>
       </div>
     </li>
